@@ -1,0 +1,265 @@
+test.txt
+by Tianen Chen
+tc2841
+
+Here, we use the example output from the test cases mentioned in the assignment handout.
+
+FIRST TEST CASE OUTPUT:
+
+	Server Output:
+tc2841@instance-1:~/finalChat$ python UdpChatServer.py 4000
+>>> [Server started.]
+^C>>> [Server shutdown]
+
+
+	Client "X" output:
+tc2841@instance-1:~/finalChat$ python UdpChat.py X 127.0.0.1 4000 2000
+>>> [Welcome, you are registered]
+>>> [Client table updated]
+>>> Online Users:
+X
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+Z
+send Y hey Y this is X
+>>> [Message received by Y ]
+send Z hey Z this is X
+>>> [Message received by Z ]
+Y: hey X this is Y
+Z: hey X this is Z talking
+dereg X
+>>> [Client table updated]
+>>> Online Users:
+Y
+Z
+>>> [You are offline. Bye.]
+reg X
+>>> [Client table updated]
+>>> Online Users:
+Y
+Z
+X
+>>> [You have messages!]
+Y: <2017-03-01 21:25:14> what's up this is going to fail X
+Z: <2017-03-01 21:25:24> this is Z. this message will fail as well!
+^C>>> [You are offline. Bye.]
+
+
+	Client "Y" output:
+tc2841@instance-1:~/finalChat$ python UdpChat.py Y 127.0.0.1 4000 3000
+>>> [Welcome, you are registered]
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+Z
+X: hey Y this is X
+send X hey X this is Y
+>>> [Message received by X ]
+send Z what's up Z this is Y
+>>> [Message received by Z ]
+Z: hey Y what's up friend
+>>> [Client table updated]
+>>> Online Users:
+Y
+Z
+send X what's up this is going to fail X
+>>> [Messages received by the server and saved.]
+>>> [No ack received, messaage sent to server]
+>>> [Client table updated]
+>>> Online Users:
+Y
+Z
+X
+>>> [Client table updated]
+>>> Online Users:
+Y
+Z
+^C>>> [You are offline. Bye.]
+
+
+	Client "Z" Output:
+tc2841@instance-1:~/finalChat$ python UdpChat.py Z 127.0.0.1 4000 5000
+>>> [Welcome, you are registered]
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+Z
+X: hey Z this is X
+Y: what's up Z this is Y
+send X hey X this is Z talking
+>>> [Message received by X ]
+send Y hey Y what's up friend
+>>> [Message received by Y ]
+>>> [Client table updated]
+>>> Online Users:
+Y
+Z
+send X this is Z. this message will fail as well!
+>>> [Messages received by the server and saved.]
+>>> [No ack received, messaage sent to server]
+>>> [Client table updated]
+>>> Online Users:
+Y
+Z
+X
+>>> [Client table updated]
+>>> Online Users:
+Y
+Z
+>>> [Client table updated]
+>>> Online Users:
+Z
+^C>>> [You are offline. Bye.]
+Exception in thread Thread-1 (most likely raised during interpreter shutdown):
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/threading.py", line 810, in __bootstrap_inner
+  File "/usr/lib/python2.7/threading.py", line 763, in run
+  File "UdpChat.py", line 153, in listen
+<type 'exceptions.AttributeError'>: 'NoneType' object has no attribute 'recv'
+
+
+
+Now, we run through the 2nd test case. Here, my code is constantly pinging the server to make sure we have a connection.
+In this case, when we exit the server, the clients X and Y do not receive acknowledgements from the server 5 times.
+Thus, they both exit immediately.
+
+	Server output:
+tc2841@instance-1:~/finalChat$ python UdpChatServer.py 4000
+>>> [Server started.]
+^C>>> [Server shutdown]
+tc2841@instance-1:~/finalChat$
+
+	
+	Client "X" output:
+tc2841@instance-1:~/finalChat$ python UdpChat.py X 127.0.0.1 4000 2000
+>>> [Welcome, you are registered]
+>>> [Client table updated]
+>>> Online Users:
+X
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+>>> [Server not responding]
+>>> [Exiting]
+tc2841@instance-1:~/finalChat$
+
+	
+	Client "Y" output:
+tc2841@instance-1:~/finalChat$ python UdpChat.py Y 127.0.0.1 4000 3000
+>>> [Welcome, you are registered]
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+>>> [Server not responding]
+>>> [Exiting]
+tc2841@instance-1:~/finalChat$
+
+
+Next, we handle some business logic errors. I try starting my server and client up with nonsense ports. Additionally, I start my client up and try typing nonsense.
+
+	Server output:
+tc2841@instance-1:~/finalChat$ python UdpChatServer.py
+>>> [Invalid port entered for server]
+tc2841@instance-1:~/finalChat$ python UdpChatServer.py hello!
+>>> [Invalid port entered for server]
+tc2841@instance-1:~/finalChat$ python UdpChatServer.py 12412412
+>>> [Server started.]
+Traceback (most recent call last):
+  File "UdpChatServer.py", line 190, in <module>
+    main()
+  File "UdpChatServer.py", line 45, in main
+    serverSocket.bind((serverIP,serverPort))
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+OverflowError: getsockaddrarg: port must be 0-65535.
+tc2841@instance-1:~/finalChat$
+
+
+	Client output:
+tc2841@instance-1:~/finalChat$ python UdpChat.py 02938
+>>> [Invalid input please try again]
+>>> [Input must be in the form of "python UdpChat.py <NICKNAME> <SERVERIP> <SERVERPORT> <YOUR PORT>"
+tc2841@instance-1:~/finalChat$ python UdpChat.py
+>>> [Invalid input please try again]
+>>> [Input must be in the form of "python UdpChat.py <NICKNAME> <SERVERIP> <SERVERPORT> <YOUR PORT>"
+tc2841@instance-1:~/finalChat$ python UdpChat.py X 127.0.0.1 4000 2000
+>>> [Welcome, you are registered]
+>>> [Client table updated]
+>>> Online Users:
+X
+jafjf
+>>> [Not a recognized command.]
+send NotAUser hello
+>>> [No such user exists within this chat client.]
+>>> [Messages received by the server and saved.]
+>>> [No ack received, messaage sent to server]
+^C>>> [You are offline. Bye.]
+
+
+Lastly, I try to log in with someone else's nickname. I throw an exception that causes the person who tried to log in to use a keyboard interrupt and try again. Meanwhile, the other two clients continue chatting without problems.
+
+	Client "X" output:
+tc2841@instance-1:~/finalChat$ python UdpChat.py X 127.0.0.1 4000 2000
+>>> [Welcome, you are registered]
+>>> [Client table updated]
+>>> Online Users:
+X
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+Y: hello
+send Y hello
+>>> [Message received by Y ]
+
+	Client "Y" output:
+tc2841@instance-1:~/finalChat$ python UdpChat.py Y 127.0.0.1 4000 3000
+>>> [Welcome, you are registered]
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+>>> [Client table updated]
+>>> Online Users:
+X
+Y
+send X hello
+>>> [Message received by X ]
+X: hello
+^C>>> [You are offline. Bye.]
+
+
+	Client who tried "X" output:
+tc2841@instance-1:~/finalChat$ python UdpChat.py X 127.0.0.1 4000 6969
+>>> [Welcome, you are registered]
+>>> [You have registered with a nickname already in use.]
+>>> [You have been disconnected from the server with specified port and IP.]
+>>> [Press ctrl+c and try signing in with a nickname not in use.]
+^C>>> [You are offline. Bye.]
+tc2841@instance-1:~/finalChat$
